@@ -19,4 +19,4 @@ jobs:
 
       - name: Upload to S3
         run: |
-          aws s3 sync glue_jobs/ s3://ecommerce-pipeline-liza/scripts/ --recursive
+          aws s3 sync glue_jobs/ s3://ecommerce-pipeline-liza/scripts/ --recursive 
