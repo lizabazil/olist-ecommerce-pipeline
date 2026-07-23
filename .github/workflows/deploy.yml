@@ -1,0 +1,15 @@
+name: Deploy Glue scripts
+on:
+  push:
+    branches: [main]
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Upload to S3
+        run: |
+          aws s3 cp glue_jobs/olist_etl_job.py s3://olist-ecommerce-pipeline-liza/scripts/olist_etl_job.py
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
