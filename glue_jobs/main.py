@@ -25,6 +25,20 @@ def load(table_name: str):
         PySpark DataFrame
     """
     return glueContext.create_dynamic_frame.from_catalog(database=database_name, table_name=table_name).toDF()
+
+def fix_header(df):
+    """
+    Sets proper header to a PySpark DataFrame when the columns' names are in the first row, not the header.
+
+    Args:
+        df: PySpark DataFrame where first row contains real column names.
+    Returns:
+        PySpark DataFrame: with correct column names
+    """
+    real_header = [str(val) for val in df.first()]  # get names of columns (which located in the first row, not header)
+    # drop first row (with real column names) and apply real names
+    new_df = df.filter(df[df.columns[0]] != real_header[0]).toDF(*real_header)
+    return new_df
     
 
 customers_df = load(customers_table)
@@ -38,24 +52,29 @@ products_df = load(products_table)
 sellers_df = load(sellers_table)
 
 
+# those two dataframes have invalid column names, the real names are in the first row
+orders_df = fix_header(orders_df)
+product_category_name_translation_df = fix_header(product_category_name_translation_df)
+
+
 print(f"Schema of the 'customers' df:")
-customers_df.printSchema()
-customers_df.show()
+# customers_df.printSchema()
+# customers_df.show()
 
 print(f"Schema of the 'geolocation' df:")
-geolocation_df.printSchema()
-geolocation_df.show()
+# geolocation_df.printSchema()
+# geolocation_df.show()
 
 print(f"Schema of the 'order_items' df:")
-order_items_df.printSchema()
-order_items_df.show()
+# order_items_df.printSchema()
+# order_items_df.show()
 print(f"Schema of the 'order_payments' df:")
-order_payments_df.printSchema()
-order_payments_df.show()
+# order_payments_df.printSchema()
+# order_payments_df.show()
 
 print(f"Schema of the 'order_reviews' df:")
-order_reviews_df.printSchema()
-order_reviews_df.show()
+# order_reviews_df.printSchema()
+# order_reviews_df.show()
 
 print(f"Schema of the 'orders' df:")
 orders_df.printSchema()
@@ -66,12 +85,12 @@ product_category_name_translation_df.printSchema()
 product_category_name_translation_df.show()
 
 print(f"Schema of the 'products' df:")
-products_df.printSchema()
-products_df.show()
+# products_df.printSchema()
+# products_df.show()
 
 print(f"Schema of the 'sellers' df:")
-sellers_df.printSchema()
-sellers_df.show()
+# sellers_df.printSchema()
+# sellers_df.show()
 
 
 job.commit()
