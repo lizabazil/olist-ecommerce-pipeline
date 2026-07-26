@@ -15,7 +15,7 @@ job = Job(glueContext)
 job.init(args['JOB_NAME'], args)
 
 
-def load(table_name: str, schema, s3_path: str):
+def load(table_name: str, schema, s3_path: str="s3://ecommerce-pipeline-liza/raw/"):
     """
     Loads a CSV file from S3 as PySpark DataFrame with written schema. 
 
@@ -27,7 +27,7 @@ def load(table_name: str, schema, s3_path: str):
         PySpark DataFrame
     """
     #return glueContext.create_dynamic_frame.from_catalog(database=database_name, table_name=table_name).toDF()
-    return spark_session.read.schema(schema).option("header", "true").option("nullValue", "null").csv(s3_path)
+    return spark_session.read.schema(schema).option("header", "true").option("nullValue", "null").csv(s3_path + f"{table_name}/")
 
 def fix_header(df):
     """
@@ -44,16 +44,26 @@ def fix_header(df):
     return new_df
     
 
-customers_df = load(customers_table, customers_schema, "s3://ecommerce-pipeline-liza/raw/customers/")
-customers_df.show(10)
-# geolocation_df = load(geolocation_table)
-# order_items_df = load(order_items_table)
-# order_payments_df = load(order_payments_table)
-# order_reviews_df = load(order_reviews_table)
-# orders_df = load(orders_table)
-# product_category_name_translation_df = load(product_category_name_translation_table)
-# products_df = load(products_table)
-# sellers_df = load(sellers_table)
+customers_df = load(customers_table, customers_schema)
+customers_df.show(5)
+
+geolocation_df = load(geolocation_table, geolocation_schema)
+order_items_df = load(order_items_table, order_items_schema)
+order_payments_df = load(order_payments_table, order_payments_schema)
+order_reviews_df = load(order_reviews_table, order_reviews_schema)
+orders_df = load(orders_table, orders_schema)
+product_category_name_translation_df = load(product_category_name_translation_table, product_category_name_translation_schema)
+products_df = load(products_table, products_schema)
+sellers_df = load(sellers_table, sellers_schema)
+
+geolocation_df.show(5)
+order_items_df.show(5)
+order_payments_df.show(5)
+order_reviews_df.show(5)
+orders_df.show(5)
+product_category_name_translation_df.show(5)
+products_df.show(5)
+sellers_df.show(5)
 
 
 # # those two dataframes have invalid column names, the real names are in the first row
