@@ -44,7 +44,7 @@ order_payments_schema = t.StructType([
     t.StructField("order_id", t.StringType(), False),
     t.StructField("payment_sequential", t.IntegerType(), True),
     t.StructField("payment_type", t.StringType(), True),
-    t.StructField("payment_installments", t.IntegetType(), True),
+    t.StructField("payment_installments", t.IntegerType(), True),
     t.StructField("payment_value", t.DoubleType(), True)
 ])
 
@@ -88,7 +88,7 @@ products_schema = t.StructType([
 
 sellers_schema = t.StructType([
     t.StructField("seller_id", t.StringType(), False),
-    t.StructField("seller_zip_code_prefix", t.IntegetType(), True),
+    t.StructField("seller_zip_code_prefix", t.IntegerType(), True),
     t.StructField("seller_city", t.StringType(), True),
     t.StructField("seller_state", t.StringType(), True)
 ])
