@@ -59,11 +59,19 @@ order_reviews_schema = t.StructType([
 ])
 
 orders_schema = t.StructType([
-
+    t.StructField("order_id", t.StringType, False),
+    t.StructField("customer_id", t.StringType, False),
+    t.StructField("order_status", t.StringType, True),
+    t.StructField("order_purchase_timestamp", t.StringType, True),  # timestamp, deal with it later
+    t.StructField("order_approved_at", t.StringType, True),  # timestamp, deal with it later
+    t.StructField("order_delivered_carrier_date", t.StringType, True),  # timestamp, deal with it later
+    t.StructField("order_delivered_customer_date", t.StringType, True),  # timestamp, deal with it later
+    t.StructField("order_estimated_delivery_date", t.StringType, True),  # timestamp, deal with it later
 ])
 
 product_category_name_translation_schema = t.StructType([
-
+    t.StructField("product_category_name", t.StringType, False),
+    t.StructField("product_category_name_english", t.StringType, False)
 ])
 
 products_schema = t.StructType([
