@@ -5,6 +5,7 @@ from pyspark.context import SparkContext
 from awsglue.context import GlueContext
 from awsglue.job import Job
 from schema_constants import *
+from pyspark.sql.functions import col, sum
 
 args = getResolvedOptions(sys.argv, ['JOB_NAME'])
 
@@ -27,25 +28,14 @@ def load(table_name: str, schema, s3_path: str="s3://ecommerce-pipeline-liza/raw
         PySpark DataFrame
     """
     #return glueContext.create_dynamic_frame.from_catalog(database=database_name, table_name=table_name).toDF()
-    return spark_session.read.schema(schema).option("header", "true").option("nullValue", "null").csv(s3_path + f"{table_name}/")
+    return spark_session.read.schema(schema).option("header", "true").option("nullValue", "").option("emptyValue", "").csv(s3_path + f"{table_name}/")
 
-def fix_header(df):
-    """
-    Sets proper header to a PySpark DataFrame when the columns' names are in the first row, not the header.
+def inspect_nulls(df: PySparkDataFrame):
+    null_counts = df.select([sum(col(c).isNull().cast("int")).alias(c) for c in df.columns])
+    null_counts.show()
 
-    Args:
-        df: PySpark DataFrame where first row contains real column names.
-    Returns:
-        PySpark DataFrame: with correct column names
-    """
-    real_header = [str(val) for val in df.first()]  # get names of columns (which located in the first row, not header)
-    # drop first row (with real column names) and apply real names
-    new_df = df.filter(df[df.columns[0]] != real_header[0]).toDF(*real_header)
-    return new_df
-    
 
 customers_df = load(customers_table, customers_schema)
-customers_df.show(5)
 
 geolocation_df = load(geolocation_table, geolocation_schema)
 order_items_df = load(order_items_table, order_items_schema)
@@ -56,14 +46,16 @@ product_category_name_translation_df = load(product_category_name_translation_ta
 products_df = load(products_table, products_schema)
 sellers_df = load(sellers_table, sellers_schema)
 
-geolocation_df.show(5)
-order_items_df.show(5)
-order_payments_df.show(5)
-order_reviews_df.show(5)
-orders_df.show(5)
-product_category_name_translation_df.show(5)
-products_df.show(5)
-sellers_df.show(5)
+inspect_nulls(customers_df)
+# customers_df.show(5)
+# geolocation_df.show(5)
+# order_items_df.show(5)
+# order_payments_df.show(5)
+# order_reviews_df.show(5)
+# orders_df.show(5)
+# product_category_name_translation_df.show(5)
+# products_df.show(5)
+# sellers_df.show(5)
 
 
 # # those two dataframes have invalid column names, the real names are in the first row
