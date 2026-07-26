@@ -33,8 +33,10 @@ def load(table_name: str, schema, s3_path: str="s3://ecommerce-pipeline-liza/raw
     .option("header", "true").option("nullValue", "").option("emptyValue", "").csv(s3_path + f"{table_name}/")
 
 def inspect_nulls(df):
-    null_counts = df.select([sum((col(c).isNull() | (col(c) == "" if isinstance(df.schema[c].dataType, t.StringType) else col(c).isNull())).cast("int")).alias(c) for c in df.columns])
-    null_counts.show()
+    rows_number = df.count()
+    print(f"Total number of rows in the df: {rows_number}")
+    null_counts_df = df.select([sum((col(c).isNull() | (col(c) == "" if isinstance(df.schema[c].dataType, t.StringType) else col(c).isNull())).cast("int")).alias(c) for c in df.columns])
+    null_counts_df.show()
 
 
 customers_df = load(customers_table, customers_schema)
