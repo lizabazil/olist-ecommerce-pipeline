@@ -30,7 +30,7 @@ def load(table_name: str, schema, s3_path: str="s3://ecommerce-pipeline-liza/raw
     #return glueContext.create_dynamic_frame.from_catalog(database=database_name, table_name=table_name).toDF()
     return spark_session.read.schema(schema).option("header", "true").option("nullValue", "").option("emptyValue", "").csv(s3_path + f"{table_name}/")
 
-def inspect_nulls(df: PySparkDataFrame):
+def inspect_nulls(df):
     null_counts = df.select([sum(col(c).isNull().cast("int")).alias(c) for c in df.columns])
     null_counts.show()
 
