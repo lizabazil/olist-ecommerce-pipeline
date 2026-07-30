@@ -59,6 +59,19 @@ inspect_nulls(product_category_name_translation_df)
 inspect_nulls(products_df)
 inspect_nulls(sellers_df)
 
+print("order_reviews_df, col review_id is null:")
+order_reviews_df.where(col("review_id").isNull()).show()
+
+print("order_reviews_df, col order_id is null:")
+order_reviews_df.where(col("order_id").isNull()).show()
+
+print("order_reviews_df, col review_score is null:")
+order_reviews_df.where(col("review_score").isNull()).show()
+
+print("order_reviews_df, col review_comment_message is null:")
+order_reviews_df.where(col("review_comment_message").isNull()).show()
+
+
 
 # # those two dataframes have invalid column names, the real names are in the first row
 # orders_df = fix_header(orders_df)
