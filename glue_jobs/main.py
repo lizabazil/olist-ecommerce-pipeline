@@ -7,6 +7,7 @@ from awsglue.job import Job
 from schema_constants import *
 from pyspark.sql.functions import col, sum
 import pyspark.sql.types as t
+import pyspark.sql.functions as f
 
 
 args = getResolvedOptions(sys.argv, ['JOB_NAME'])
@@ -49,69 +50,36 @@ product_category_name_translation_df = load(product_category_name_translation_ta
 products_df = load(products_table, products_schema)
 sellers_df = load(sellers_table, sellers_schema)
 
-inspect_nulls(customers_df)
-inspect_nulls(geolocation_df)
-inspect_nulls(order_items_df)
-inspect_nulls(order_payments_df)
-inspect_nulls(order_reviews_df)
-inspect_nulls(orders_df)
-inspect_nulls(product_category_name_translation_df)
-inspect_nulls(products_df)
-inspect_nulls(sellers_df)
+# inspect_nulls(customers_df)
+# inspect_nulls(geolocation_df)
+# inspect_nulls(order_items_df)
+# inspect_nulls(order_payments_df)
+# inspect_nulls(order_reviews_df)
+# inspect_nulls(orders_df)
+# inspect_nulls(product_category_name_translation_df)
+# inspect_nulls(products_df)
+# inspect_nulls(sellers_df)
 
-print("order_reviews_df, col review_id is null:")
-order_reviews_df.where(col("review_id").isNull()).show()
+print("customers df:")
+print(customers_df.describe().show())
 
-print("order_reviews_df, col order_id is null:")
-order_reviews_df.where(col("order_id").isNull()).show()
+print("geolocation_df:")
+print(geolocation_df.describe().show())
 
-print("order_reviews_df, col review_score is null:")
-order_reviews_df.where(col("review_score").isNull()).show()
+print("order_items_df df:")
+print(order_items_df.describe().show())
 
-print("order_reviews_df, col review_comment_message is null:")
-order_reviews_df.where(col("review_comment_message").isNull()).show()
+print("order_payments_df df:")
+print(order_payments_df.describe().show())
 
+print("order_reviews_df df:")
+print(order_reviews_df.describe().show())
 
+print("orders_df df:")
+print(orders_df.describe().show())
 
-# # those two dataframes have invalid column names, the real names are in the first row
-# orders_df = fix_header(orders_df)
-# product_category_name_translation_df = fix_header(product_category_name_translation_df)
-
-
-# print(f"Schema of the 'customers' df:")
-# # customers_df.printSchema()
-# # customers_df.show()
-
-# print(f"Schema of the 'geolocation' df:")
-# # geolocation_df.printSchema()
-# # geolocation_df.show()
-
-# print(f"Schema of the 'order_items' df:")
-# # order_items_df.printSchema()
-# # order_items_df.show()
-# print(f"Schema of the 'order_payments' df:")
-# # order_payments_df.printSchema()
-# # order_payments_df.show()
-
-# print(f"Schema of the 'order_reviews' df:")
-# # order_reviews_df.printSchema()
-# # order_reviews_df.show()
-
-# print(f"Schema of the 'orders' df:")
-# orders_df.printSchema()
-# orders_df.show()
-
-# print(f"Schema of the 'product_category_name_translation' df:")
-# product_category_name_translation_df.printSchema()
-# product_category_name_translation_df.show()
-
-# print(f"Schema of the 'products' df:")
-# products_df.printSchema()
-# products_df.show()
-
-# print(f"Schema of the 'sellers' df:")
-# sellers_df.printSchema()
-# sellers_df.show()
+print("products_df df:")
+print(products_df.describe().show())
 
 
 job.commit()
