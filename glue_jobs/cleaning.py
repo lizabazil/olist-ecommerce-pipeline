@@ -13,5 +13,31 @@ def delete_duplicates(df):
     return df.dropDuplicates()
 
 
-def tranform_column_to_timestamp_type(df, column_name):
-    pass
+def transform_column_to_timestamp_type(df, column_name):
+    """
+    Transforms specified column to a timestamp type in pattern: yyyy-MM-dd HH:mm:ss . 
+    Args:
+        df: DataFrame to be changed.
+    
+    Returns:
+        PySpark DataFrame: Dataframe with specified column changed to a timestamp type. 
+    """
+    df = df.withColumn(column_name, f.when(f.col(column_name).isin("0", None), None)
+                                           .otherwise(f.to_timestamp(f.col(column_name), "yyyy-MM-dd HH:mm:ss")))
+    return df
+
+
+def delete_rows_with_invalid_lat_and_long(geolocation_df):
+    """
+    In the dataframe 'geolocation' exist invalid values for columns 'geolocation_lat' and 'geolocation_lng'. 
+    This function filters rows and leaves only those, who have valid values 
+    (for Brazil: Latitude from -33.7508 to 5.2744; Longitude from -73.9833 to -34.7914).
+
+    Args:
+        geolocation_df: 'geolocation' dataframe.
+    Rerurns:
+        Dataframe: with only valid values for latitude and longtitude.
+    """
+    geolocation_df = geolocation_df.where(f.col("geolocation_lat").between(-33.7508, 5.2744))
+    geolocation_df = geolocation_df.where(f.col("geolocation_lng").between(-73.9833, -34.7914))
+    return geolocation_df 
