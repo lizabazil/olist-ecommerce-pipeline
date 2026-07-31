@@ -43,7 +43,7 @@ def inspect_nulls(df):
 def inspecting_int_and_double_columns(list_of_dfs):
     # inspecting only int and double columns
     for curr_df in list_of_dfs:
-        num_cols = [f.name for f in curr_df.schema.fields if isinstance(f.dataType, t.IntergerType) or isinstance(f.dataType, t.DoubleType)]
+        num_cols = [f.name for f in curr_df.schema.fields if isinstance(f.dataType, t.IntegerType) or isinstance(f.dataType, t.DoubleType)]
         curr_df.select(num_cols).summary().show()
 
 
