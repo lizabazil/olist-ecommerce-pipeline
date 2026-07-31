@@ -52,6 +52,7 @@ def are_all_timestamps_have_the_same_h_m_s(df, column_name_str):
               count(minute(f.col(column_name_str)) != 0).alias("non_zero_minutes"),
               count(second(f.col(column_name_str)) != 0).alias("non_zero_seconds")
               ).show()
+    df.where(hour(f.col(column_name_str)) != 0 | minute(f.col(column_name_str)) != 0 | second(f.col(column_name_str)) != 0).show()
 
 
 if __name__ == "__main__":
@@ -100,6 +101,6 @@ if __name__ == "__main__":
     # order_reviews
     order_reviews_df = delete_column(order_reviews_df, "review_comment_title")  # over 70% of empty values in this column
     are_all_timestamps_have_the_same_h_m_s(order_reviews_df, "review_creation_date")
-    
+
     job.commit()
         
