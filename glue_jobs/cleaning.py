@@ -41,3 +41,18 @@ def delete_rows_with_invalid_lat_and_long(geolocation_df):
     geolocation_df = geolocation_df.where(f.col("geolocation_lat").between(-33.7508, 5.2744))
     geolocation_df = geolocation_df.where(f.col("geolocation_lng").between(-73.9833, -34.7914))
     return geolocation_df 
+
+
+def delete_column(df, column_name):
+    """
+    Drops specified column in a given dataframe.
+    Args:
+        df: PySpark Dataframe.
+        column_name: Name of a column to be deleted (string).
+    
+    Returns:
+        DataFrame: without deleted column.
+    """
+    df = df.drop(f.col(column_name))
+    return df 
+

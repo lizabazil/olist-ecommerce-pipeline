@@ -5,10 +5,10 @@ from pyspark.context import SparkContext
 from awsglue.context import GlueContext
 from awsglue.job import Job
 from schema_constants import *
-from pyspark.sql.functions import col, sum
+from pyspark.sql.functions import col, sum, hour, minute, second, count
 import pyspark.sql.types as t
 import pyspark.sql.functions as f
-from cleaning import delete_duplicates, transform_column_to_timestamp_type, delete_rows_with_invalid_lat_and_long
+from cleaning import delete_duplicates, transform_column_to_timestamp_type, delete_rows_with_invalid_lat_and_long, delete_column
 
 
 args = getResolvedOptions(sys.argv, ['JOB_NAME'])
@@ -45,6 +45,13 @@ def inspecting_int_and_double_columns(list_of_dfs):
     for curr_df in list_of_dfs:
         num_cols = [f.name for f in curr_df.schema.fields if isinstance(f.dataType, t.IntegerType) or isinstance(f.dataType, t.DoubleType)]
         curr_df.select(num_cols).summary().show()
+
+def are_all_timestamps_have_the_same_h_m_s(df, column_name_str):
+    # order_reviews 
+    df.select(count(hour(f.col(column_name_str)) != 0).alias("non_zero_hours"),
+              count(minute(f.col(column_name_str)) != 0).alias("non_zero_minutes"),
+              count(second(f.col(column_name_str)) != 0).alias("non_zero_seconds")
+              ).show()
 
 
 if __name__ == "__main__":
@@ -88,11 +95,11 @@ if __name__ == "__main__":
     orders_df = transform_column_to_timestamp_type(orders_df, "order_estimated_delivery_date")
 
     # geolocation dataframe
-    print(f"Geolocation df before deleting invalid rows: {geolocation_df.count()}")
     geolocation_df = delete_rows_with_invalid_lat_and_long(geolocation_df)
-    print(f"Geolocation df after deleting invalid rows: {geolocation_df.count()}")
 
-    inspecting_int_and_double_columns([customers_df, geolocation_df, order_items_df, order_payments_df, order_reviews_df, orders_df, products_df])
-
+    # order_reviews
+    order_reviews_df = delete_column(order_reviews_df, "review_comment_title")  # over 70% of empty values in this column
+    are_all_timestamps_have_the_same_h_m_s(order_reviews_df, "review_creation_date")
+    
     job.commit()
         
