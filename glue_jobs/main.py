@@ -8,7 +8,7 @@ from schema_constants import *
 from pyspark.sql.functions import col, sum, hour, minute, second, count
 import pyspark.sql.types as t
 import pyspark.sql.functions as f
-from cleaning import delete_duplicates, transform_column_to_timestamp_type, delete_rows_with_invalid_lat_and_long, delete_column
+from cleaning import delete_duplicates, transform_column_to_timestamp_type, delete_rows_with_invalid_lat_and_long, delete_column, replace_column_value_to_null
 
 
 args = getResolvedOptions(sys.argv, ['JOB_NAME'])
@@ -56,7 +56,7 @@ def are_all_timestamps_have_the_same_h_m_s(df, column_name_str):
 
 def detect_timestamp_pattern_in_string_column(df, column_name):
     detected_timestamp_df = df.where(f.to_timestamp(f.col(column_name), "yyyy-MM-dd HH:mm:ss").isNotNull())
-    print(f"Dataframe with rows, where column {column_name} has timestamps data, which indicates invalid data (lenght={detected_timestamp_df.count()})")
+    print(f"Dataframe with rows, where column {column_name} has timestamps data, which indicates invalid data (length={detected_timestamp_df.count()})")
     detected_timestamp_df.show()
 
 
@@ -106,5 +106,9 @@ if __name__ == "__main__":
     # order_reviews
     order_reviews_df = delete_column(order_reviews_df, "review_comment_title")  # over 70% of empty values in this column
     detect_timestamp_pattern_in_string_column(order_reviews_df, "review_comment_message")
+    order_reviews_df = replace_column_value_to_null(order_reviews_df, "review_comment_message")
+    detect_timestamp_pattern_in_string_column(order_reviews_df, "review_comment_message")
+
+    order_reviews_df.show()
     job.commit()
         

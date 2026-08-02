@@ -56,3 +56,12 @@ def delete_column(df, column_name):
     df = df.drop(f.col(column_name))
     return df 
 
+def replace_column_value_to_null(df, column_name):
+    """
+    Replaces column value to NULL on the condition that the value in the column is in the timestamp format. This function primarly made for the 
+    dataframe 'order_reviews', where in the column with type string found timestamps.
+
+    """
+    df = df.withColumn(column_name, f.when(f.to_timestamp(f.col(column_name), "yyyy-MM-dd HH:mm:ss").isNotNull(), None).otherwise(df[column_name]))
+    return df
+
