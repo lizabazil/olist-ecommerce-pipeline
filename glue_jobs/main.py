@@ -54,6 +54,11 @@ def are_all_timestamps_have_the_same_h_m_s(df, column_name_str):
               ).show()
     df.where((hour(f.col(column_name_str)) != 0) | (minute(f.col(column_name_str)) != 0) | (second(f.col(column_name_str)) != 0)).show()
 
+def detect_timestamp_pattern_in_string_column(df, column_name):
+    detected_timestamp_df = df.where(f.to_timestamp(f.col(column_name), "yyyy-MM-dd HH:mm:ss").isNotNull())
+    print(f"Dataframe with rows, where column {column_name} has timestamps data, which indicates invalid data (lenght={detected_timestamp_df.count()})")
+    detected_timestamp_df.show()
+
 
 if __name__ == "__main__":
     customers_df = load(customers_table, customers_schema)
@@ -100,7 +105,6 @@ if __name__ == "__main__":
 
     # order_reviews
     order_reviews_df = delete_column(order_reviews_df, "review_comment_title")  # over 70% of empty values in this column
-    are_all_timestamps_have_the_same_h_m_s(order_reviews_df, "review_creation_date")
-
+    detect_timestamp_pattern_in_string_column(order_reviews_df, "review_comment_message")
     job.commit()
         
