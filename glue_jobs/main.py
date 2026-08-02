@@ -59,6 +59,14 @@ def detect_timestamp_pattern_in_string_column(df, column_name):
     print(f"Dataframe with rows, where column {column_name} has timestamps data, which indicates invalid data (length={detected_timestamp_df.count()})")
     detected_timestamp_df.show()
 
+def detect_invalid_review_id(df, column_name):
+    detected_invalid_id_df = df.where((f.col(column_name).contains(" ")) | ~(f.col(column_name).rlike(".*[0-9].*")))
+    count = detected_invalid_id_df.count()
+    if count > 0:
+        print(f"Detected rows where column '{column_name}' has invalid id (length={column_name.count()}): ")
+        detected_invalid_id_df.show()
+
+
 
 if __name__ == "__main__":
     customers_df = load(customers_table, customers_schema)
@@ -105,10 +113,9 @@ if __name__ == "__main__":
 
     # order_reviews
     order_reviews_df = delete_column(order_reviews_df, "review_comment_title")  # over 70% of empty values in this column
-    detect_timestamp_pattern_in_string_column(order_reviews_df, "review_comment_message")
+    # detect_timestamp_pattern_in_string_column(order_reviews_df, "review_comment_message")
     order_reviews_df = replace_column_value_to_null(order_reviews_df, "review_comment_message")
-    detect_timestamp_pattern_in_string_column(order_reviews_df, "review_comment_message")
+    detect_invalid_review_id(order_reviews_df, "review_id")
 
-    order_reviews_df.show()
     job.commit()
         
