@@ -8,7 +8,8 @@ from schema_constants import *
 from pyspark.sql.functions import col, sum, hour, minute, second, count
 import pyspark.sql.types as t
 import pyspark.sql.functions as f
-from cleaning import (delete_duplicates, transform_column_to_timestamp_type, delete_rows_with_invalid_lat_and_long, delete_column, replace_column_value_to_null, delete_rows_where_review_id_invalid)
+from cleaning import (delete_duplicates, transform_column_to_timestamp_type, delete_rows_with_invalid_lat_and_long, delete_column, 
+                      replace_column_value_to_null, delete_rows_where_review_id_invalid, delete_rows_where_column_value_is_timestamp_instead_of_string)
 
 
 args = getResolvedOptions(sys.argv, ['JOB_NAME'])
@@ -127,7 +128,11 @@ if __name__ == "__main__":
 
     order_reviews_df = delete_rows_where_review_id_invalid(order_reviews_df, "review_id")
     #detect_invalid_review_id(order_reviews_df, "review_id")
-    detect_timestamp_pattern_in_string_column(order_reviews_df, "order_id")
+    #detect_timestamp_pattern_in_string_column(order_reviews_df, "order_id")
+    count_before = order_reviews_df.count()
+    order_reviews_df = delete_rows_where_column_value_is_timestamp_instead_of_string(order_reviews_df, "order_id")
+    count_after = order_reviews_df.count()
+    print(f"Deleted rows in order_reviews={count_before - count_after}")
 
     job.commit()
         

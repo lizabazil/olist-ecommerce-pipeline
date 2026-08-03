@@ -1,4 +1,5 @@
 import pyspark.sql.functions as f
+from schema_constants import *
 
 
 def delete_duplicates(df):
@@ -23,7 +24,7 @@ def transform_column_to_timestamp_type(df, column_name):
         PySpark DataFrame: Dataframe with specified column changed to a timestamp type. 
     """
     df = df.withColumn(column_name, f.when(f.col(column_name).isin("0", None), None)
-                                           .otherwise(f.to_timestamp(f.col(column_name), "yyyy-MM-dd HH:mm:ss")))
+                                           .otherwise(f.to_timestamp(f.col(column_name), timestamp_pattern)))
     return df
 
 
@@ -67,7 +68,7 @@ def replace_column_value_to_null(df, column_name):
         DataFrame: where values in the specified column are replaced by NULL on condition.
 
     """
-    df = df.withColumn(column_name, f.when(f.to_timestamp(f.col(column_name), "yyyy-MM-dd HH:mm:ss").isNotNull(), None).otherwise(df[column_name]))
+    df = df.withColumn(column_name, f.when(f.to_timestamp(f.col(column_name), timestamp_pattern).isNotNull(), None).otherwise(df[column_name]))
     return df
 
 # for order_reviews_df dataframe
@@ -81,5 +82,19 @@ def delete_rows_where_review_id_invalid(df, column_name):
         columm_name: Column for performing filtering.
     """
     filtered_df = df.where(~(f.col(column_name).contains(" ")) & (f.col(column_name).rlike(".*[0-9].*")))
+    return filtered_df
+
+def delete_rows_where_column_value_is_timestamp_instead_of_string(df, column_name):
+    """
+    Leaves in the dataframe only those rows, which are not in timestamp pattern.
+
+    Args:
+        df: Input DataFrame.
+        column_name: Column to be validated. 
+
+    Returns:
+        DataFrame: 
+    """
+    filtered_df = df.where(f.to_timestamp(f.col(column_name), timestamp_pattern).isNull())
     return filtered_df
 

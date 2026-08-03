@@ -1,6 +1,7 @@
 import pyspark.sql.types as t
 
 database_name = "ecommerce_raw_db"
+timestamp_pattern = "yyyy-MM-dd HH:mm:ss"
 
 # tables' names
 customers_table = "customers"
