@@ -136,6 +136,7 @@ if __name__ == "__main__":
     order_reviews_df = delete_rows_where_review_id_invalid(order_reviews_df, "review_id")
     order_reviews_df = delete_rows_where_column_value_is_timestamp_instead_of_string(order_reviews_df, "order_id")
 
+    detect_multiple_cols_have_null_value(order_reviews_df, ("order_id"))
     detect_multiple_cols_have_null_value(order_reviews_df, ("review_score", "review_comment_message", "review_creation_date", "review_answer_timestamp"))
 
     job.commit()
