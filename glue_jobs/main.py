@@ -76,6 +76,13 @@ def detect_invalid_review_id(df, column_name):
         detected_invalid_id_df.show()
     return None
 
+def detect_multiple_cols_have_null_value(df, column_names_tuple):
+    col_one, col_two, col_three, col_four = column_names_tuple
+    detected_df = df.where((f.col(col_one).isNull()) & (f.col(col_two).isNull()) & (f.col(col_three).isNull()) & (f.col(col_four).isNull()))
+    print(f"Detected rows where columns {column_names_tuple} are all NULL, length={detected_df.count()}")
+    detected_df.show()
+    return None 
+
 
 
 if __name__ == "__main__":
@@ -127,12 +134,9 @@ if __name__ == "__main__":
     order_reviews_df = replace_column_value_to_null(order_reviews_df, "review_comment_message")
 
     order_reviews_df = delete_rows_where_review_id_invalid(order_reviews_df, "review_id")
-    #detect_invalid_review_id(order_reviews_df, "review_id")
-    #detect_timestamp_pattern_in_string_column(order_reviews_df, "order_id")
-    count_before = order_reviews_df.count()
     order_reviews_df = delete_rows_where_column_value_is_timestamp_instead_of_string(order_reviews_df, "order_id")
-    count_after = order_reviews_df.count()
-    print(f"Deleted rows in order_reviews={count_before - count_after}")
+
+    detect_multiple_cols_have_null_value(order_reviews_df, ("review_score", "review_comment_message", "review_creation_date", "review_answer_timestamp"))
 
     job.commit()
         
