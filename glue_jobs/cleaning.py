@@ -98,3 +98,16 @@ def delete_rows_where_column_value_is_timestamp_instead_of_string(df, column_nam
     filtered_df = df.where(f.to_timestamp(f.col(column_name), timestamp_pattern).isNull())
     return filtered_df
 
+def delete_rows_where_column_value_is_null(df, column_name):
+    """
+    Deletes rows, where given column's value is NULL.
+
+    Args:
+        df: PySpark DataFrame.
+        column_name: column to be checked.
+    Returns:
+        DataFrame: Filtered dataframe.
+    """
+    df = df.where(f.col(column_name).isNotNull())
+    return df 
+
