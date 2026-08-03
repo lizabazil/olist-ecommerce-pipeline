@@ -61,9 +61,9 @@ def detect_timestamp_pattern_in_string_column(df, column_name):
 
 def detect_invalid_review_id(df, column_name):
     detected_invalid_id_df = df.where((f.col(column_name).contains(" ")) | ~(f.col(column_name).rlike(".*[0-9].*")))
-    count = detected_invalid_id_df.count()
-    if count > 0:
-        print(f"Detected rows where column '{column_name}' has invalid id (length={column_name.count()}): ")
+    count_of_invalid_rows = detected_invalid_id_df.count()
+    if count_of_invalid_rows > 0:
+        print(f"Detected rows where column '{column_name}' has invalid id (length={count_of_invalid_rows}): ")
         detected_invalid_id_df.show()
 
 
