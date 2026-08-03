@@ -60,8 +60,26 @@ def replace_column_value_to_null(df, column_name):
     """
     Replaces column value to NULL on the condition that the value in the column is in the timestamp format. This function primarly made for the 
     dataframe 'order_reviews', where in the column with type string found timestamps.
+    Args:
+        df: DataFrame.
+        column_name: 
+    Returns:
+        DataFrame: where values in the specified column are replaced by NULL on condition.
 
     """
     df = df.withColumn(column_name, f.when(f.to_timestamp(f.col(column_name), "yyyy-MM-dd HH:mm:ss").isNotNull(), None).otherwise(df[column_name]))
     return df
+
+# for order_reviews_df dataframe
+def delete_rows_where_review_id_invalid(df, column_name):
+    """"
+    Removes rows where value in the column invalid. For example, there is a text. 
+    The condition is that rows with spaces or no digits in the column are deleted.
+    The condition is that rows in the resulting dataframe must have no spaces in the column and contain at least one digit.
+    Args:
+        df: DataFrame order_reviews.
+        columm_name: Column for performing filtering.
+    """
+    filtered_df = df.where(~(f.col(column_name).contains(" ")) & (f.col(column_name).rlike(".*[0-9].*")))
+    return filtered_df
 

@@ -8,7 +8,7 @@ from schema_constants import *
 from pyspark.sql.functions import col, sum, hour, minute, second, count
 import pyspark.sql.types as t
 import pyspark.sql.functions as f
-from cleaning import delete_duplicates, transform_column_to_timestamp_type, delete_rows_with_invalid_lat_and_long, delete_column, replace_column_value_to_null
+from cleaning import (delete_duplicates, transform_column_to_timestamp_type, delete_rows_with_invalid_lat_and_long, delete_column, replace_column_value_to_null, delete_rows_where_review_id_invalid)
 
 
 args = getResolvedOptions(sys.argv, ['JOB_NAME'])
@@ -60,6 +60,10 @@ def detect_timestamp_pattern_in_string_column(df, column_name):
     detected_timestamp_df.show()
 
 def detect_invalid_review_id(df, column_name):
+    """
+    Detects rows, where the given column has invalid values. The check is performed using regex and detecting if value
+    has space or digits. The check is failed if value contains space or does not contain any digits (0-9).
+    """
     detected_invalid_id_df = df.where((f.col(column_name).contains(" ")) | ~(f.col(column_name).rlike(".*[0-9].*")))
     count_of_invalid_rows = detected_invalid_id_df.count()
     if count_of_invalid_rows > 0:
@@ -115,7 +119,12 @@ if __name__ == "__main__":
     order_reviews_df = delete_column(order_reviews_df, "review_comment_title")  # over 70% of empty values in this column
     # detect_timestamp_pattern_in_string_column(order_reviews_df, "review_comment_message")
     order_reviews_df = replace_column_value_to_null(order_reviews_df, "review_comment_message")
-    detect_invalid_review_id(order_reviews_df, "review_id")
+
+    count_before = order_reviews_df.count()
+    order_reviews_df = delete_rows_where_review_id_invalid(order_reviews_df, "review_id")
+    count_after = order_reviews_df.count()
+    print(f"Deleted rows={count_before - count_after}")
+    #detect_invalid_review_id(order_reviews_df, "review_id")
 
     job.commit()
         
