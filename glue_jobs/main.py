@@ -131,16 +131,11 @@ if __name__ == "__main__":
 
     # order_reviews
     order_reviews_df = delete_column(order_reviews_df, "review_comment_title")  # over 70% of empty values in this column
-    # detect_timestamp_pattern_in_string_column(order_reviews_df, "review_comment_message")
     order_reviews_df = replace_column_value_to_null(order_reviews_df, "review_comment_message")
 
     order_reviews_df = delete_rows_where_review_id_invalid(order_reviews_df, "review_id")
     order_reviews_df = delete_rows_where_column_value_is_timestamp_instead_of_string(order_reviews_df, "order_id")
-
-    count_before = order_reviews_df.count()
     order_reviews_df = delete_rows_where_column_value_is_null(order_reviews_df, "order_id")
-    count_after = order_reviews_df.count()
-    print(f"Deleted rows={count_before - count_after}")
 
     job.commit()
         
