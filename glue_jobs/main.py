@@ -1,9 +1,4 @@
-import sys
-from awsglue.transforms import *
-from awsglue.utils import getResolvedOptions
-from pyspark.context import SparkContext
-from awsglue.context import GlueContext
-from awsglue.job import Job
+from context import job
 from schema_constants import *
 from pyspark.sql.functions import col, sum, hour, minute, second, count
 import pyspark.sql.types as t
@@ -13,14 +8,6 @@ from cleaning import (delete_duplicates, transform_column_to_timestamp_type, del
                       delete_rows_where_column_value_is_null)
 from input_output import load, save
 
-
-args = getResolvedOptions(sys.argv, ['JOB_NAME'])
-
-sc = SparkContext()
-glueContext = GlueContext(sc)
-spark_session = glueContext.spark_session
-job = Job(glueContext)
-job.init(args['JOB_NAME'], args)
 
 
 def inspect_nulls(df):
@@ -134,6 +121,6 @@ if __name__ == "__main__":
     save(product_category_name_translation_df, product_category_name_translation_table)
     save(products_df, products_table)
     save(sellers_df, sellers_table)
-    
+
     job.commit()
         

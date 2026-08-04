@@ -1,4 +1,6 @@
 from schema_constants import *
+from context import spark_session
+
 
 
 def load(table_name: str, schema, s3_path: str=f"{s_three_bucket_name}raw/"):
