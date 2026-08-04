@@ -27,5 +27,5 @@ def save(df, table_name: str):
     Returns:
         None
     """
-    df.write(mode("overwrite").parquet(f"{s_three_bucket_name}processed/{table_name}"))
+    df.write.mode("overwrite").parquet(f"{s_three_bucket_name}processed/{table_name}")
     return None
