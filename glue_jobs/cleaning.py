@@ -39,8 +39,8 @@ def delete_rows_with_invalid_lat_and_long(geolocation_df):
     Rerurns:
         Dataframe: with only valid values for latitude and longtitude.
     """
-    geolocation_df = geolocation_df.where(f.col(geolocation_lat_col).between(-33.7508, 5.2744))
-    geolocation_df = geolocation_df.where(f.col(geolocation_lng_col).between(-73.9833, -34.7914))
+    geolocation_df = geolocation_df.where((f.col(geolocation_lat_col).between(-33.7508, 5.2744))
+                                          & (f.col(geolocation_lng_col).between(-73.9833, -34.7914)))
     return geolocation_df 
 
 
