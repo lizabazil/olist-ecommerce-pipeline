@@ -11,6 +11,7 @@ import pyspark.sql.functions as f
 from cleaning import (delete_duplicates, transform_column_to_timestamp_type, delete_rows_with_invalid_lat_and_long, delete_column, 
                       replace_column_value_to_null, delete_rows_where_review_id_invalid, delete_rows_where_column_value_is_timestamp_instead_of_string,
                       delete_rows_where_column_value_is_null)
+from input_output import load, save
 
 
 args = getResolvedOptions(sys.argv, ['JOB_NAME'])
@@ -21,20 +22,6 @@ spark_session = glueContext.spark_session
 job = Job(glueContext)
 job.init(args['JOB_NAME'], args)
 
-
-def load(table_name: str, schema, s3_path: str="s3://ecommerce-pipeline-liza/raw/"):
-    """
-    Loads a CSV file from S3 as PySpark DataFrame with written schema. 
-
-    Args:
-        table_name: name of the table.
-        schema: PySpark StructType schema to enforce. 
-        s3_path: S3 path to the CSV folder.
-    Returns:
-        PySpark DataFrame
-    """
-    return spark_session.read.schema(schema) \
-    .option("header", "true").option("nullValue", "").option("emptyValue", "").csv(s3_path + f"{table_name}/")
 
 def inspect_nulls(df):
     rows_number = df.count()
@@ -137,5 +124,16 @@ if __name__ == "__main__":
     order_reviews_df = delete_rows_where_column_value_is_timestamp_instead_of_string(order_reviews_df, order_id_col)
     order_reviews_df = delete_rows_where_column_value_is_null(order_reviews_df, order_id_col)
 
+    # saving cleaned dataframes to the s3 in parquet format
+    save(customers_df, customers_table)
+    save(geolocation_df, geolocation_table)
+    save(order_items_df, order_items_table)
+    save(order_payments_df, order_payments_table)
+    save(order_reviews_df, order_reviews_table)
+    save(orders_df, orders_table)
+    save(product_category_name_translation_df, product_category_name_translation_table)
+    save(products_df, products_table)
+    save(sellers_df, sellers_table)
+    
     job.commit()
         

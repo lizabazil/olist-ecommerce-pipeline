@@ -1,5 +1,7 @@
 import pyspark.sql.types as t
 
+s_three_bucket_name = "s3://ecommerce-pipeline-liza/"
+
 database_name = "ecommerce_raw_db"
 timestamp_pattern = "yyyy-MM-dd HH:mm:ss"
 
