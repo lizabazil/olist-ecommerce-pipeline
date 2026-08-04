@@ -116,26 +116,26 @@ if __name__ == "__main__":
 
 
     # dealing with date columns (transfrorming them from string to timestamps type using patterns for timestamp parsing)
-    order_items_df = transform_column_to_timestamp_type(order_items_df, "shipping_limit_date")
+    order_items_df = transform_column_to_timestamp_type(order_items_df, shipping_limit_date_col)
 
-    order_reviews_df = transform_column_to_timestamp_type(order_reviews_df, "review_creation_date")
-    order_reviews_df = transform_column_to_timestamp_type(order_reviews_df, "review_answer_timestamp")
-    orders_df = transform_column_to_timestamp_type(orders_df, "order_purchase_timestamp")
-    orders_df = transform_column_to_timestamp_type(orders_df, "order_approved_at")
-    orders_df = transform_column_to_timestamp_type(orders_df, "order_delivered_carrier_date")
-    orders_df = transform_column_to_timestamp_type(orders_df, "order_delivered_customer_date")
-    orders_df = transform_column_to_timestamp_type(orders_df, "order_estimated_delivery_date")
+    order_reviews_df = transform_column_to_timestamp_type(order_reviews_df, review_creation_date_col)
+    order_reviews_df = transform_column_to_timestamp_type(order_reviews_df, review_answer_timestamp_col)
+    orders_df = transform_column_to_timestamp_type(orders_df, order_purchase_timestamp_col)
+    orders_df = transform_column_to_timestamp_type(orders_df, order_approved_at_col)
+    orders_df = transform_column_to_timestamp_type(orders_df, order_delivered_carrier_date_col)
+    orders_df = transform_column_to_timestamp_type(orders_df, order_delivered_customer_date_col)
+    orders_df = transform_column_to_timestamp_type(orders_df, order_estimated_delivery_date_col)
 
     # geolocation dataframe
     geolocation_df = delete_rows_with_invalid_lat_and_long(geolocation_df)
 
     # order_reviews
-    order_reviews_df = delete_column(order_reviews_df, "review_comment_title")  # over 70% of empty values in this column
-    order_reviews_df = replace_column_value_to_null(order_reviews_df, "review_comment_message")
+    order_reviews_df = delete_column(order_reviews_df, review_comment_title_col)  # over 70% of empty values in this column
+    order_reviews_df = replace_column_value_to_null(order_reviews_df, review_comment_message_col)
 
-    order_reviews_df = delete_rows_where_review_id_invalid(order_reviews_df, "review_id")
-    order_reviews_df = delete_rows_where_column_value_is_timestamp_instead_of_string(order_reviews_df, "order_id")
-    order_reviews_df = delete_rows_where_column_value_is_null(order_reviews_df, "order_id")
+    order_reviews_df = delete_rows_where_review_id_invalid(order_reviews_df, review_id_col)
+    order_reviews_df = delete_rows_where_column_value_is_timestamp_instead_of_string(order_reviews_df, order_id_col)
+    order_reviews_df = delete_rows_where_column_value_is_null(order_reviews_df, order_id_col)
 
     job.commit()
         
