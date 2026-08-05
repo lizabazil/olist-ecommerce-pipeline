@@ -6,7 +6,7 @@ import pyspark.sql.functions as f
 from cleaning import (delete_duplicates, transform_column_to_timestamp_type, delete_rows_with_invalid_lat_and_long, delete_column, 
                       replace_column_value_to_null, delete_rows_where_review_id_invalid, delete_rows_where_column_value_is_timestamp_instead_of_string,
                       delete_rows_where_column_value_is_null)
-from input_output import load, save
+from input_output import load, save, save_orders_df_with_partition_by_month_year
 
 
 
@@ -117,7 +117,9 @@ if __name__ == "__main__":
     save(order_items_df, order_items_table)
     save(order_payments_df, order_payments_table)
     save(order_reviews_df, order_reviews_table)
-    save(orders_df, orders_table)
+
+    # special function for orders dataframe, as there is performed partition 
+    save_orders_df_with_partition_by_month_year(orders_df, orders_table)
     save(product_category_name_translation_df, product_category_name_translation_table)
     save(products_df, products_table)
     save(sellers_df, sellers_table)
