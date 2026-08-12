@@ -45,4 +45,26 @@ def run_all_queries():
                   """,
                   output_folder="payment_method_breakdown_by_revenue"
     )
+
+    run_and_save_query(
+        sql_query="""
+                    WITH first_stats AS (
+
+                    SELECT o.purchase_year, o.purchase_month,
+                            ROUND(AVG(op.payment_value), 2) AS avg_order_value
+                    FROM olist_processed_db.order_payments op 
+                    INNER JOIN olist_processed_db.orders o 
+                    ON o.order_id = op.order_id
+                    GROUP BY o.purchase_year, o.purchase_month
+                    )
+
+                    SELECT purchase_year, 
+                            purchase_month,
+                            avg_order_value,
+                            LAG(avg_order_value, 1, NULL) OVER(ORDER BY purchase_year, purchase_month) AS prev_month_avg,
+                            ROUND((avg_order_value - LAG(avg_order_value, 1, NULL) OVER(ORDER BY purchase_year, purchase_month)) / LAG(avg_order_value, 1, NULL) OVER(ORDER BY purchase_year, purchase_month) * 100, 2) AS mom_change_pct
+                    FROM first_stats
+                    """,
+                    output_folder="average_order_value_over_time"
+    )
     return None
