@@ -5,7 +5,7 @@ import pyspark.sql.types as t
 import pyspark.sql.functions as f
 from cleaning import (delete_duplicates, transform_column_to_timestamp_type, delete_rows_with_invalid_lat_and_long, delete_column, 
                       replace_column_value_to_null, delete_rows_where_review_id_invalid, delete_rows_where_column_value_is_timestamp_instead_of_string,
-                      delete_rows_where_column_value_is_null)
+                      delete_rows_where_column_value_is_null, delete_rows_with_not_defined_payment_type)
 from input_output import load, save, save_orders_df_with_partition_by_month_year
 
 
@@ -110,6 +110,9 @@ if __name__ == "__main__":
     order_reviews_df = delete_rows_where_review_id_invalid(order_reviews_df, review_id_col)
     order_reviews_df = delete_rows_where_column_value_is_timestamp_instead_of_string(order_reviews_df, order_id_col)
     order_reviews_df = delete_rows_where_column_value_is_null(order_reviews_df, order_id_col)
+
+    # order_payments
+    order_payments_df = delete_rows_with_not_defined_payment_type(order_payments_df)
 
     # saving cleaned dataframes to the s3 in parquet format
     save(customers_df, customers_table)

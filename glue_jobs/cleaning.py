@@ -111,3 +111,14 @@ def delete_rows_where_column_value_is_null(df, column_name):
     df = df.where(f.col(column_name).isNotNull())
     return df 
 
+def delete_rows_with_not_defined_payment_type(order_payments_df):
+    """
+    Function for order_payments DataFrame. 
+    Deletes rows where the column 'payment_type' has value 'not_defined'. 
+    Args:
+        order_payments_df: PySpark DataFrame.
+    Returns:
+        PySpark DataFrame: cleaned DataFrame.
+    """
+    order_payments_df = order_payments_df.where(f.col(payment_type_col) != "not_defined")
+    return order_payments_df
