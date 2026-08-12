@@ -67,4 +67,19 @@ def run_all_queries():
                     """,
                     output_folder="average_order_value_over_time"
     )
+
+    run_and_save_query(
+        sql_query="""
+                    SELECT op.payment_installments,
+                    COUNT(*) AS total_orders,
+                    ROUND(SUM(payment_value), 2) AS total_revenue,
+                    ROUND(AVG(payment_value), 2) AS avg_order_value
+            FROM olist_processed_db.order_payments op 
+            INNER JOIN olist_processed_db.orders o 
+            ON o.order_id = op.order_id
+            GROUP BY op.payment_installments
+            ORDER BY op.payment_installments
+                    """,
+                    output_folder="revenue_by_installments"
+    )
     return None
