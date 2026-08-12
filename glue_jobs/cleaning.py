@@ -122,3 +122,15 @@ def delete_rows_with_not_defined_payment_type(order_payments_df):
     """
     order_payments_df = order_payments_df.where(f.col(payment_type_col) != "not_defined")
     return order_payments_df
+
+def delete_rows_with_zero_installments(order_payments_df):
+    """
+    Deletes rows where column 'payment_installments' has value 0.
+
+    Args:
+        order_payments_df: PySpark DataFrame.
+    Returns:
+        PySpark DataFrame: cleaned DataFrame
+    """
+    order_payments_df = order_payments_df.where(f.col(payment_installments_col) >= 1)
+    return order_payments_df
