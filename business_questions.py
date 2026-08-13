@@ -169,4 +169,25 @@ def run_all_queries():
                         """, 
                         output_folder="geographic_customer_distribution"
     )
+
+    run_and_save_query(
+        sql_query="""
+                        WITH total_orders_per_status AS (
+                        SELECT order_status, 
+                                COUNT(*) AS total_orders 
+                        FROM olist_processed_db.orders 
+                        GROUP BY order_status
+                        )
+
+                        SELECT *, 
+                                ROUND(total_orders * 100.0 / SUM(total_orders) OVER(), 2) AS pct_of_total
+                        FROM total_orders_per_status
+                        ORDER BY total_orders DESC
+                """, 
+                output_folder="order_status_funnel"
+    )
+    
+
+        # TODO: filter out orders with status 'unavailable' or 'cancelled' to get the correct calculations about revenue
+
     return None
