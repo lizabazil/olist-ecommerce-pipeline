@@ -82,4 +82,91 @@ def run_all_queries():
                     """,
                     output_folder="revenue_by_installments"
     )
+
+        # customer segmentation by their total spend: high_value > 1000; mid_value > 500; else low_value
+    run_and_save_query(
+        sql_query="""
+                WITH customer_metrics AS (
+                        SELECT o.customer_id, SUM(op.payment_value) AS total_spent,
+                                COUNT(DISTINCT o.order_id) AS total_orders
+                        FROM olist_processed_db.customers c
+                        LEFT JOIN olist_processed_db.orders o ON c.customer_id = o.customer_id
+                        LEFT JOIN olist_processed_db.order_payments op ON o.order_id = op.order_id
+                        GROUP BY o.customer_id
+                        ),
+                
+                segmented_by_total_spent AS (    
+                SELECT *,
+                CASE WHEN total_spent > 1000 THEN 'high_value'
+                        WHEN total_spent > 500 THEN 'mid_value'
+                        ELSE 'low_value'
+                        END AS customer_segment
+                FROM customer_metrics
+                )
+
+                SELECT customer_segment, COUNT(customer_segment) AS total_customers,
+                        ROUND(AVG(total_spent), 2) AS avg_lifetime_revenue,
+                        AVG(total_orders) AS avg_orders
+                FROM segmented_by_total_spent
+                GROUP BY customer_segment
+                """,
+                output_folder="customer_lifetime_value_segmentation"
+        )   
+    run_and_save_query(
+                    sql_query="""
+                                WITH customer_first_purchase AS (
+                        SELECT c.customer_unique_id,
+                        MIN(purchase_year) AS first_purchase_year,
+                        MIN(purchase_month) AS first_purchase_month
+                        FROM olist_processed_db.orders o
+                        LEFT JOIN olist_processed_db.customers c ON o.customer_id = c.customer_id
+        
+                        GROUP BY c.customer_unique_id
+                        ),
+                        classified_orders AS (
+                                        SELECT o.purchase_year,
+                                        o.purchase_month, 
+                                        c.customer_unique_id,
+                                        CASE WHEN o.purchase_year = cfp.first_purchase_year 
+                                        AND o.purchase_month = cfp.first_purchase_month 
+                                        THEN 'new'
+                                        ELSE 'returning'
+                                        END AS new_or_returning_customer
+                                        FROM olist_processed_db.orders o
+                                        LEFT JOIN olist_processed_db.customers c ON o.customer_id = c.customer_id
+                                        LEFT JOIN customer_first_purchase cfp ON cfp.customer_unique_id = c.customer_unique_id
+                                        )
+                                        
+                        SELECT purchase_year, purchase_month, 
+                                COUNT(DISTINCT CASE WHEN new_or_returning_customer = 'new' THEN customer_unique_id END) AS new_customers,
+                                COUNT(DISTINCT CASE WHEN new_or_returning_customer = 'returning' THEN customer_unique_id END) AS returning_customers
+                        FROM classified_orders
+                        GROUP BY purchase_year, purchase_month
+                        ORDER BY purchase_year, purchase_month
+                                """,
+                                output_folder="customer_acquistion_by_month"
+                )
+
+        # shows which states drive the most customers and revenue
+    run_and_save_query(
+        sql_query="""
+                        WITH customer_states AS (
+
+                        SELECT c.customer_state, 
+                                COUNT(c.customer_unique_id) AS total_customers,
+                                ROUND(SUM(op.payment_value), 2) AS total_revenue,
+                                ROUND(AVG(op.payment_value), 2) AS avg_order_value
+                        FROM olist_processed_db.customers c 
+                        LEFT JOIN olist_processed_db.orders o ON c.customer_id = o.customer_id
+                        LEFT JOIN olist_processed_db.order_payments op ON op.order_id = o.order_id
+                        GROUP BY c.customer_state
+                        )
+
+                        SELECT *,
+                                ROUND(total_customers * 100.0 / SUM(total_customers) OVER(), 2) AS pct_of_customers
+                        FROM customer_states
+                        ORDER BY pct_of_customers DESC
+                        """, 
+                        output_folder="geographic_customer_distribution"
+    )
     return None
