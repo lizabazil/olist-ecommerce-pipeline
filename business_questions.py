@@ -11,7 +11,7 @@ def run_all_queries():
                     o.purchase_month,
                         ROUND(SUM(op.payment_value), 2) AS monthly_revenue
                 FROM olist_processed_db.orders o 
-                LEFT JOIN olist_processed_db.order_payments op 
+                INNER JOIN olist_processed_db.order_payments op 
                 ON o.order_id = op.order_id
                 GROUP BY o.purchase_year, o.purchase_month
                 ORDER BY o.purchase_year, o.purchase_month
@@ -90,8 +90,8 @@ def run_all_queries():
                         SELECT o.customer_id, SUM(op.payment_value) AS total_spent,
                                 COUNT(DISTINCT o.order_id) AS total_orders
                         FROM olist_processed_db.customers c
-                        LEFT JOIN olist_processed_db.orders o ON c.customer_id = o.customer_id
-                        LEFT JOIN olist_processed_db.order_payments op ON o.order_id = op.order_id
+                        INNER JOIN olist_processed_db.orders o ON c.customer_id = o.customer_id
+                        INNER JOIN olist_processed_db.order_payments op ON o.order_id = op.order_id
                         GROUP BY o.customer_id
                         ),
                 
@@ -119,7 +119,7 @@ def run_all_queries():
                         MIN(purchase_year) AS first_purchase_year,
                         MIN(purchase_month) AS first_purchase_month
                         FROM olist_processed_db.orders o
-                        LEFT JOIN olist_processed_db.customers c ON o.customer_id = c.customer_id
+                        INNER JOIN olist_processed_db.customers c ON o.customer_id = c.customer_id
         
                         GROUP BY c.customer_unique_id
                         ),
@@ -133,8 +133,8 @@ def run_all_queries():
                                         ELSE 'returning'
                                         END AS new_or_returning_customer
                                         FROM olist_processed_db.orders o
-                                        LEFT JOIN olist_processed_db.customers c ON o.customer_id = c.customer_id
-                                        LEFT JOIN customer_first_purchase cfp ON cfp.customer_unique_id = c.customer_unique_id
+                                        INNER JOIN olist_processed_db.customers c ON o.customer_id = c.customer_id
+                                        INNER JOIN customer_first_purchase cfp ON cfp.customer_unique_id = c.customer_unique_id
                                         )
                                         
                         SELECT purchase_year, purchase_month, 
@@ -157,8 +157,8 @@ def run_all_queries():
                                 ROUND(SUM(op.payment_value), 2) AS total_revenue,
                                 ROUND(AVG(op.payment_value), 2) AS avg_order_value
                         FROM olist_processed_db.customers c 
-                        LEFT JOIN olist_processed_db.orders o ON c.customer_id = o.customer_id
-                        LEFT JOIN olist_processed_db.order_payments op ON op.order_id = o.order_id
+                        INNER JOIN olist_processed_db.orders o ON c.customer_id = o.customer_id
+                        INNER JOIN olist_processed_db.order_payments op ON op.order_id = o.order_id
                         GROUP BY c.customer_state
                         )
 
