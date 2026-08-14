@@ -229,7 +229,32 @@ def run_all_queries():
                         """, 
                         output_folder="estimated_vs_actual_delivery_performance"
     )
-    
+
+    run_and_save_query(
+        sql_query="""
+                        WITH init_days AS (
+                        SELECT DAY_OF_WEEK(order_purchase_timestamp) AS order_day_of_week, 
+                                HOUR(order_purchase_timestamp) AS order_hour,
+                                COUNT(*) AS total_orders
+                        FROM olist_processed_db.orders
+                        GROUP BY DAY_OF_WEEK(order_purchase_timestamp), HOUR(order_purchase_timestamp)
+                        )
+
+                        SELECT CASE WHEN order_day_of_week = 1 THEN 'Monday'
+                                WHEN order_day_of_week = 2 THEN 'Tuesday'
+                                WHEN order_day_of_week = 3 THEN 'Wednesday'
+                                WHEN order_day_of_week = 4 THEN 'Thursday'
+                                WHEN order_day_of_week = 5 THEN 'Friday'
+                                WHEN order_day_of_week = 6 THEN 'Saturday'
+                                WHEN order_day_of_week = 7 THEN 'Sunday' 
+                                END
+                                AS order_day_of_week,
+                                order_hour, total_orders
+                        FROM init_days
+                        ORDER BY total_orders DESC
+                """, 
+                output_folder="peak_ordering_hours_and_days"
+    )
 
         # TODO: filter out orders with status 'unavailable' or 'cancelled' to get the correct calculations about revenue
 
