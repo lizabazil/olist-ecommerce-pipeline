@@ -256,6 +256,35 @@ def run_all_queries():
                 output_folder="peak_ordering_hours_and_days"
     )
 
+    run_and_save_query(
+        sql_query="""
+                        WITH order_payments_agg AS (
+            SELECT order_id, 
+            SUM(payment_value) AS total_order_payment_amount
+            FROM olist_processed_db.order_payments
+            GROUP BY order_id
+            )
+
+                SELECT pt.product_category_name_english, 
+                        COUNT(DISTINCT o.order_id) AS total_orders, 
+                        ROUND(SUM(op.total_order_payment_amount), 2) AS total_revenue, 
+                        ROUND(AVG(orew.review_score), 2) AS avg_review_score,
+                        ROUND(AVG(DATE_DIFF('day', o.order_purchase_timestamp, o.order_delivered_customer_date)), 0)AS 
+                        avg_delivery_days
+                FROM olist_processed_db.order_items oi 
+                INNER JOIN olist_processed_db.orders o ON oi.order_id = o.order_id
+                INNER JOIN order_payments_agg op ON op.order_id = o.order_id
+                INNER JOIN olist_processed_db.products p ON p.product_id = oi.product_id
+                INNER JOIN olist_processed_db.product_category_name_translation pt ON pt.product_category_name 
+                        = p.product_category_name
+                INNER JOIN olist_processed_db.order_reviews orew ON orew.order_id = o.order_id 
+                WHERE o.order_status = 'delivered'
+                GROUP BY pt.product_category_name_english
+                ORDER BY total_revenue DESC
+                """, 
+                output_folder="category_performance_scorecard"
+    )
+
         # TODO: filter out orders with status 'unavailable' or 'cancelled' to get the correct calculations about revenue
 
     return None
