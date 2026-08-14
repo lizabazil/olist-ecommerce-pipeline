@@ -186,6 +186,49 @@ def run_all_queries():
                 """, 
                 output_folder="order_status_funnel"
     )
+
+        # the orders with unknown estimated or actual delivery date were removed from this analysis
+    run_and_save_query(
+        sql_query="""
+                        WITH date_diffs AS (
+                                SELECT order_delivered_customer_date, order_estimated_delivery_date,
+                                DATE_DIFF('day', CAST(order_estimated_delivery_date AS DATE), 
+                                CAST(order_delivered_customer_date AS DATE)) AS days_diff
+                                FROM olist_processed_db.orders
+                                WHERE order_delivered_customer_date IS NOT NULL AND order_estimated_delivery_date IS NOT NULL
+                        ), 
+                        segmented_deliveries AS 
+                        (SELECT *, 
+                                CASE WHEN days_diff < 0 THEN 'early'
+                                WHEN days_diff = 0 THEN 'on_time'
+                                WHEN days_diff <= 3 THEN '1_to_3_days_late'
+                                WHEN days_diff <= 7 THEN '4_to_7_days_late'
+                                ELSE '7_plus_days_late'
+                                END AS delivery_performance
+                                
+                        FROM date_diffs
+                        ), 
+
+                        grouped_del_perf AS (
+                        SELECT delivery_performance, 
+                                COUNT(*) AS total_orders 
+                        FROM segmented_deliveries
+                        GROUP BY delivery_performance
+                        )
+
+                        SELECT * , 
+                                ROUND(total_orders * 100.0 / SUM(total_orders) OVER(), 2) AS pct_of_orders
+                        FROM grouped_del_perf
+                        ORDER BY CASE delivery_performance 
+                                WHEN 'early' THEN 1
+                                WHEN 'on_time' THEN 2 
+                                WHEN '1_to_3_days_late' THEN 3 
+                                WHEN '4_to_7_days_late' THEN 4 
+                                WHEN '7_plus_days_late' THEN 5
+                                END 
+                        """, 
+                        output_folder="estimated_vs_actual_delivery_performance"
+    )
     
 
         # TODO: filter out orders with status 'unavailable' or 'cancelled' to get the correct calculations about revenue
