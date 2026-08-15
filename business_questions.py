@@ -13,6 +13,7 @@ def run_all_queries():
                 FROM olist_processed_db.orders o 
                 INNER JOIN olist_processed_db.order_payments op 
                 ON o.order_id = op.order_id
+                WHERE o.order_status NOT IN ('unavailable', 'cancelled')
                 GROUP BY o.purchase_year, o.purchase_month
                 ORDER BY o.purchase_year, o.purchase_month
                 )
@@ -35,6 +36,7 @@ def run_all_queries():
                         FROM olist_processed_db.order_payments op 
                         INNER JOIN olist_processed_db.orders o 
                         ON o.order_id = op.order_id
+                        WHERE o.order_status NOT IN ('unavailable', 'cancelled')
                         GROUP BY op.payment_type
                         ORDER BY total_revenue DESC
                         )
@@ -77,6 +79,7 @@ def run_all_queries():
             FROM olist_processed_db.order_payments op 
             INNER JOIN olist_processed_db.orders o 
             ON o.order_id = op.order_id
+            WHERE o.order_status NOT IN ('unavailable', 'cancelled')
             GROUP BY op.payment_installments
             ORDER BY op.payment_installments
                     """,
@@ -92,6 +95,7 @@ def run_all_queries():
                         FROM olist_processed_db.customers c
                         INNER JOIN olist_processed_db.orders o ON c.customer_id = o.customer_id
                         INNER JOIN olist_processed_db.order_payments op ON o.order_id = op.order_id
+                         WHERE o.order_status NOT IN ('unavailable', 'cancelled')
                         GROUP BY o.customer_id
                         ),
                 
@@ -159,6 +163,7 @@ def run_all_queries():
                         FROM olist_processed_db.customers c 
                         INNER JOIN olist_processed_db.orders o ON c.customer_id = o.customer_id
                         INNER JOIN olist_processed_db.order_payments op ON op.order_id = o.order_id
+                        WHERE o.order_status NOT IN ('unavailable', 'cancelled')
                         GROUP BY c.customer_state
                         )
 
@@ -315,7 +320,5 @@ def run_all_queries():
                 """, 
                 output_folder="seller_concentration_risk"
     )
-
-        # TODO: filter out orders with status 'unavailable' or 'cancelled' to get the correct calculations about revenue
 
     return None
