@@ -1,4 +1,5 @@
 from sql.utils import run_and_save_query
+from sql.athena_constants import *
 
 
 
@@ -22,7 +23,7 @@ def run_all_queries():
                         ROUND(SUM(monthly_revenue) OVER (ORDER BY purchase_year, purchase_month), 2) AS running_total
                 FROM monthly_revenue
                 """,
-                output_folder="montly_revenue_and_running_total"
+                output_folder=montly_revenue_and_running_total
     )
 
     run_and_save_query(
@@ -45,7 +46,7 @@ def run_all_queries():
                         ROUND(total_revenue / SUM(total_revenue) OVER () * 100, 2) AS pct_of_total_revenue
                     FROM first_stats
                   """,
-                  output_folder="payment_method_breakdown_by_revenue"
+                  output_folder=payment_method_breakdown_by_revenue
     )
 
     run_and_save_query(
@@ -67,7 +68,7 @@ def run_all_queries():
                             ROUND((avg_order_value - LAG(avg_order_value, 1, NULL) OVER(ORDER BY purchase_year, purchase_month)) / LAG(avg_order_value, 1, NULL) OVER(ORDER BY purchase_year, purchase_month) * 100, 2) AS mom_change_pct
                     FROM first_stats
                     """,
-                    output_folder="average_order_value_over_time"
+                    output_folder=average_order_value_over_time
     )
 
     run_and_save_query(
@@ -83,7 +84,7 @@ def run_all_queries():
             GROUP BY op.payment_installments
             ORDER BY op.payment_installments
                     """,
-                    output_folder="revenue_by_installments"
+                    output_folder=revenue_by_installments
     )
 
         # customer segmentation by their total spend: high_value > 1000; mid_value > 500; else low_value
@@ -114,7 +115,7 @@ def run_all_queries():
                 FROM segmented_by_total_spent
                 GROUP BY customer_segment
                 """,
-                output_folder="customer_lifetime_value_segmentation"
+                output_folder=customer_lifetime_value_segmentation
         )   
     run_and_save_query(
                     sql_query="""
@@ -148,7 +149,7 @@ def run_all_queries():
                         GROUP BY purchase_year, purchase_month
                         ORDER BY purchase_year, purchase_month
                                 """,
-                                output_folder="customer_acquistion_by_month"
+                                output_folder=customer_acquistion_by_month
                 )
 
         # shows which states drive the most customers and revenue
@@ -172,7 +173,7 @@ def run_all_queries():
                         FROM customer_states
                         ORDER BY pct_of_customers DESC
                         """, 
-                        output_folder="geographic_customer_distribution"
+                        output_folder=geographic_customer_distribution
     )
 
     run_and_save_query(
@@ -189,7 +190,7 @@ def run_all_queries():
                         FROM total_orders_per_status
                         ORDER BY total_orders DESC
                 """, 
-                output_folder="order_status_funnel"
+                output_folder=order_status_funnel
     )
 
         # the orders with unknown estimated or actual delivery date were removed from this analysis
@@ -232,7 +233,7 @@ def run_all_queries():
                                 WHEN '7_plus_days_late' THEN 5
                                 END 
                         """, 
-                        output_folder="estimated_vs_actual_delivery_performance"
+                        output_folder=estimated_vs_actual_delivery_performance
     )
 
     run_and_save_query(
@@ -258,7 +259,7 @@ def run_all_queries():
                         FROM init_days
                         ORDER BY total_orders DESC
                 """, 
-                output_folder="peak_ordering_hours_and_days"
+                output_folder=peak_ordering_hours_and_days
     )
 
     run_and_save_query(
@@ -287,7 +288,7 @@ def run_all_queries():
                 GROUP BY pt.product_category_name_english
                 ORDER BY total_revenue DESC
                 """, 
-                output_folder="category_performance_scorecard"
+                output_folder=category_performance_scorecard
     )
 
     run_and_save_query(
@@ -318,7 +319,7 @@ def run_all_queries():
                         END
                         ORDER BY total_revenue DESC
                 """, 
-                output_folder="seller_concentration_risk"
+                output_folder=seller_concentration_risk
     )
 
     return None
