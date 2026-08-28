@@ -1,6 +1,7 @@
 ## Dashboard
 
-Built in Power BI Desktop connecting to Athena query results stored in S3.
+Built in Power BI Desktop connecting to AWS Athena query results stored in Amazon S3. 
+The published dashboard uses a static, imported dataset. 
 
 ### Revenue Overview
 ![Revenue & Sales Performance](screenshots/dashboard_page_1.jpg)
