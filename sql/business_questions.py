@@ -4,6 +4,12 @@ from sql.athena_constants import *
 
 
 def run_all_queries():
+    """
+    Run all SQl queries and save result to the specified folders to Amazon S3. 
+
+    Returns:
+        None
+    """
     run_and_save_query(
         sql_query="""
                 WITH monthly_revenue AS 

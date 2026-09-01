@@ -12,6 +12,13 @@ The final data is visualized in a Power BI dashboard to deliver business insight
 
 Apache Airflow orchestrates a Medallion data lake architecture on AWS. Raw CSVs (Bronze) are transformed via AWS Glue PySpark into optimized Parquet files (Silver), which are then queried by Amazon Athena to create final business-level aggregations (Gold) for Power BI.
 
+The successful run of an Airflow tasks shown below. 
+![Airflow Graph](screenshots/ecommerce_pipeline-graph.png)
+
+Successful run of an Glue ETL job: 
+
+![Glue ETL Job](screenshots/success_etl_job.jpg)
+
 ## Dashboard
 
 Built in Power BI Desktop connecting to AWS Athena query results stored in Amazon S3. 

@@ -72,16 +72,6 @@ if __name__ == "__main__":
     products_df = load(products_table, products_schema)
     sellers_df = load(sellers_table, sellers_schema)
 
-    # inspect_nulls(customers_df)
-    # inspect_nulls(geolocation_df)
-    # inspect_nulls(order_items_df)
-    # inspect_nulls(order_payments_df)
-    # inspect_nulls(order_reviews_df)
-    # inspect_nulls(orders_df)
-    # inspect_nulls(product_category_name_translation_df)
-    # inspect_nulls(products_df)
-    # inspect_nulls(sellers_df)
-
     customers_df = delete_duplicates(customers_df)
     order_items_df = delete_duplicates(order_items_df)
     order_payments_df = delete_duplicates(order_payments_df)
