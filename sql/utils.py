@@ -13,6 +13,9 @@ def run_and_save_query(sql_query: str, output_folder: str, database: str = "olis
     
     Returns:
         None
+
+    Raises:
+        Exception: If the query has status "FAILED" or "CANCELLED". 
     """
     client = boto3.client("athena", region_name="eu-north-1")
     response = client.start_query_execution(
@@ -35,10 +38,9 @@ def run_and_save_query(sql_query: str, output_folder: str, database: str = "olis
         status_of_query = response_status["QueryExecution"]["Status"]
         state_of_query = status_of_query["State"]
         if state_of_query == "SUCCEEDED":
-            print(f"Query to folder {output_folder} has succeeded.")
             break
         elif state_of_query in ["FAILED", "CANCELLED"]:
-            print(f"Query has {state_of_query}: {status_of_query["AthenaError"]["ErrorMessage"]}")
+            raise Exception(f"Query has {state_of_query}: {status_of_query["AthenaError"]["ErrorMessage"]}")
 
         time.sleep(2)
 
